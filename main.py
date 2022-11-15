@@ -5,6 +5,8 @@ import datetime
 from datetime import date, timedelta
 import plotly.graph_objects as go
 import plotly.express as px
+import matplotlib
+import matplotlib.pyplot as plt
 
 #Collecting Google Stock price Data
 today = date.today()
@@ -15,15 +17,53 @@ data_frame2 = data_frame2.strftime("%Y-%m-%d")
 startdate = data_frame2
 
 #Downloading dataset from Google
-data_google = yf.download('GOOG',start = startdate,end = enddate,progress=False)
+data = yf.download('GOOG',start = startdate,end = enddate,progress=False)
 
 # When Analyzing stock market, begin with candlestick chart. This chart will analyze the price movements of stock prices.
-data_google["Date"] = data_google.index
-data_google = data_google[["Date","Open","High","Low","Close","Adj Close","Volume"]]
-data_google.reset_index(drop = True,inplace = True)
-print(data_google.head())
+data["Date"] = data.index
+data= data[["Date","Open","High","Low","Close","Adj Close","Volume"]]
+data.reset_index(drop = True,inplace = True)
+print(data.head())
 
 # Now we visualize the candelstick chart of the Google Stock prices
-figure1 = go.Figure(data_google =[go.Candlestick(x = data_google["Date"],open = data_google["Open"],high = data_google["High"],low = data_google["Low"],close = data_google["Close"])])
-figure1.update_layout(title = "Google Stock Price Analysis",xaxis_rangeslider_visible = False)
-figure1.show()
+figure = go.Figure(data =[go.Candlestick(x = data["Date"],
+                                                open = data["Open"],
+                                                high = data["High"],
+                                                low = data["Low"],
+                                                close = data["Close"])])
+figure.update_layout(title = "Google Stock Price Analysis",xaxis_rangeslider_visible = False)
+figure.show()
+
+# Creating a Bar plot: To analyze the stock market
+figure = px.bar(data,x = "Date",y ="Close")
+figure.show()
+
+#Rangeslider helps analyze the stock market between two specific points
+figure = px.line(data, x ='Date',y='Close',
+                title = 'Stock Market Analysis with Rangeslider')
+figure.update_xaxes(rangeslider_visible = True)
+figure.show()
+
+# Adding time period selectors: Buttons that show the graph of a specific time period (1 year, 3 months,6 months)
+figure = px.line(data, x = 'Date', y ='Close',title = 'Stock Market Analysis with Time Period Selectors')
+figure.update_xaxes(
+    rangeselector = dict(
+        buttons = list([
+            dict(count =1, label = "1m",step ="month",stepmode ="backward"),
+            dict(count =6 , label ="6m",step ="month",stepmode ="backward"),
+            dict(count =3, label = "3m",step ="month",stepmode ="backward"),
+            dict(count =1, label = "1y",step ="year",stepmode ="backward"),
+            dict(step="all")
+        ])
+    )
+)
+figure.show()
+# This is how to remove all records of the weekend trends, this is because weekend or holiday weekend affects the stock market
+figure = px.scatter(data, x = 'Date', y = 'Close',range_x = ['2021=07-12','2022-07-11'],title = "Stock Market Analysis by Removing Weekend Gaps")
+figure.update_xaxes(
+    rangebreaks = [
+        dict(bounds=["sat","sun"])
+    ]
+)
+figure.show()
+
