@@ -32,3 +32,37 @@ figure = go.Figure(data =[go.Candlestick(x = data["Date"],
                                                close = data["Close"])])
 figure.update_layout(title = "Amazon Stock Price Analysis",xaxis_rangeslider_visible = False)
 figure.show()
+
+# Creating a Bar plot: To analyze the stock: Amazon
+figure = px.bar(data,x = "Date",y ="Close")
+figure.show()
+
+
+#Rangeslider helps analyze the stock price of Amazon between two specific points
+figure = px.line(data, x ='Date',y='Close',
+                title = 'AMAZON Stock Price Analysis with Rangeslider')
+figure.update_xaxes(rangeslider_visible = True)
+figure.show()
+
+# Adding time period selectors: Buttons that show the graph of a specific time period (1 year, 3 months,6 months)
+figure = px.line(data, x = 'Date', y ='Close',title = 'AMAZON Stock Price Analysis with Time Period Selectors')
+figure.update_xaxes(
+    rangeselector = dict(
+        buttons = list([
+            dict(count =1, label = "1m",step ="month",stepmode ="backward"),
+            dict(count =6 , label ="6m",step ="month",stepmode ="backward"),
+            dict(count =3, label = "3m",step ="month",stepmode ="backward"),
+            dict(count =1, label = "1y",step ="year",stepmode ="backward"),
+            dict(step="all")
+        ])
+    )
+)
+figure.show()
+# This is how to remove all records of the weekend trends, this is because weekend or holiday weekend affects the stock market
+figure = px.scatter(data, x = 'Date', y = 'Close',range_x = ['2021=07-12','2022-07-11'],title = "AMAZON Stock Price Analysis by Removing Weekend Gaps")
+figure.update_xaxes(
+    rangebreaks = [
+        dict(bounds=["sat","sun"])
+    ]
+)
+figure.show()
